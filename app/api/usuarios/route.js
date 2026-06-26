@@ -39,7 +39,7 @@ export async function POST(request) {
     const dados = novo.toJSON();
     delete dados.senha;
     return NextResponse.json(
-      { usuario: dados, mensagem: 'Usuário criado com sucesso', _debug: { keys: Object.keys(dados), id: novo.id } },
+      { usuario: dados, mensagem: 'Usuário criado com sucesso' },
       { status: 201 }
     );
   } catch (error) {
