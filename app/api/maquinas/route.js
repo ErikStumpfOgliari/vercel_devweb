@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Op } from 'sequelize';
 import { Usuario, Maquina, syncDb } from '../../../lib/models/index.js';
 import { verificarTokenReq } from '../../../lib/auth.js';
 
@@ -12,25 +11,16 @@ export async function GET(request) {
   try {
     await syncDb();
     const { searchParams } = new URL(request.url);
-    const tipo = searchParams.get('tipo');
-    const q = searchParams.get('q');
+    const tipo  = searchParams.get('tipo');
+    const q     = searchParams.get('q');
     const local = searchParams.get('local');
 
     const where = {};
-    if (tipo) where.tipo_maquina = tipo.trim();
+    if (tipo)  where.tipo_maquina  = tipo.trim();
+    if (q)     where._nome_ilike   = `%${q.trim()}%`;
+    if (local) where._local_ilike  = `%${local.trim()}%`;
 
-    const conds = [];
-    if (q) conds.push({ nome: { [Op.iLike]: `%${q.trim()}%` } });
-    if (local) conds.push({ localizacao: { [Op.iLike]: `%${local.trim()}%` } });
-    if (conds.length === 1) Object.assign(where, conds[0]);
-    if (conds.length > 1) where[Op.and] = conds;
-
-    const maquinas = await Maquina.findAll({
-      where,
-      include: [{ model: Usuario, as: 'proprietario', attributes: ['id', 'nome', 'cidade'] }],
-      order: [['created_at', 'DESC']],
-    });
-
+    const maquinas = await Maquina.findAll({ where, includeOwner: true });
     return NextResponse.json(maquinas.map(enriquecer));
   } catch (error) {
     return NextResponse.json(
@@ -71,10 +61,7 @@ export async function POST(request) {
       disponibilidade: disponibilidade !== false && disponibilidade !== 'false',
     });
 
-    const completa = await Maquina.findByPk(nova.id, {
-      include: [{ model: Usuario, as: 'proprietario', attributes: ['id', 'nome', 'cidade'] }],
-    });
-
+    const completa = await Maquina.findByPk(nova.id, { includeOwner: true });
     return NextResponse.json(
       { maquina: enriquecer(completa || nova), mensagem: 'Máquina cadastrada com sucesso.' },
       { status: 201 }

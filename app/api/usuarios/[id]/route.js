@@ -7,7 +7,8 @@ export async function GET(request, { params }) {
   try {
     const decoded = verificarTokenReq(request);
     if (!decoded) return NextResponse.json({ erro: 'Não autenticado.' }, { status: 401 });
-    if (decoded.id !== Number(params.id)) return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
+    if (decoded.id !== Number(params.id))
+      return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
 
     await syncDb();
     const usuario = await Usuario.findByPk(params.id);
@@ -25,7 +26,8 @@ export async function PUT(request, { params }) {
   try {
     const decoded = verificarTokenReq(request);
     if (!decoded) return NextResponse.json({ erro: 'Não autenticado.' }, { status: 401 });
-    if (decoded.id !== Number(params.id)) return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
+    if (decoded.id !== Number(params.id))
+      return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
 
     await syncDb();
     const usuario = await Usuario.findByPk(params.id);
@@ -62,7 +64,8 @@ export async function DELETE(request, { params }) {
   try {
     const decoded = verificarTokenReq(request);
     if (!decoded) return NextResponse.json({ erro: 'Não autenticado.' }, { status: 401 });
-    if (decoded.id !== Number(params.id)) return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
+    if (decoded.id !== Number(params.id))
+      return NextResponse.json({ erro: 'Acesso negado.' }, { status: 403 });
 
     await syncDb();
     const deletado = await Usuario.destroy({ where: { id: params.id } });

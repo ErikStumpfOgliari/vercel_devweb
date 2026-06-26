@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Usuario, Maquina, syncDb } from '../../../../lib/models/index.js';
+import { Maquina, syncDb } from '../../../../lib/models/index.js';
 import { verificarTokenReq } from '../../../../lib/auth.js';
 
 export async function GET(request) {
@@ -10,8 +10,7 @@ export async function GET(request) {
     await syncDb();
     const lista = await Maquina.findAll({
       where: { id_proprietario: decoded.id },
-      include: [{ model: Usuario, as: 'proprietario', attributes: ['id', 'nome'] }],
-      order: [['created_at', 'DESC']],
+      includeOwner: true,
     });
 
     return NextResponse.json(lista.map((m) => m.toJSON()));

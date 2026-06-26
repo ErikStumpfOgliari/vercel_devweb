@@ -38,9 +38,12 @@ export async function POST(request) {
 
     const dados = novo.toJSON();
     delete dados.senha;
-    return NextResponse.json({ usuario: dados, mensagem: 'Usuário criado com sucesso' }, { status: 201 });
+    return NextResponse.json(
+      { usuario: dados, mensagem: 'Usuário criado com sucesso' },
+      { status: 201 }
+    );
   } catch (error) {
-    if (error.name === 'SequelizeUniqueConstraintError' || error.parent?.code === '23505') {
+    if (error.code === '23505') {
       return NextResponse.json({ erro: 'Este e-mail já está cadastrado.' }, { status: 409 });
     }
     return NextResponse.json(

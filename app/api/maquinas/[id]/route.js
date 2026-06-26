@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Usuario, Maquina, syncDb } from '../../../../lib/models/index.js';
+import { Maquina, syncDb } from '../../../../lib/models/index.js';
 import { verificarTokenReq } from '../../../../lib/auth.js';
 
 function enriquecer(m) {
@@ -10,15 +10,7 @@ function enriquecer(m) {
 export async function GET(request, { params }) {
   try {
     await syncDb();
-    const maquina = await Maquina.findByPk(params.id, {
-      include: [
-        {
-          model: Usuario,
-          as: 'proprietario',
-          attributes: ['id', 'nome', 'email', 'telefone', 'cidade', 'estado'],
-        },
-      ],
-    });
+    const maquina = await Maquina.findByPk(params.id, { includeOwner: true });
     if (!maquina) return NextResponse.json({ erro: 'Máquina não encontrada' }, { status: 404 });
     return NextResponse.json(enriquecer(maquina));
   } catch (error) {
@@ -49,11 +41,11 @@ export async function PUT(request, { params }) {
     delete body.id_proprietario;
     await maquina.update(body);
 
-    const completa = await Maquina.findByPk(params.id, {
-      include: [{ model: Usuario, as: 'proprietario', attributes: ['id', 'nome', 'cidade'] }],
+    const completa = await Maquina.findByPk(params.id, { includeOwner: true });
+    return NextResponse.json({
+      maquina: enriquecer(completa || maquina),
+      mensagem: 'Máquina atualizada com sucesso',
     });
-
-    return NextResponse.json({ maquina: enriquecer(completa || maquina), mensagem: 'Máquina atualizada com sucesso' });
   } catch (error) {
     return NextResponse.json(
       { erro: 'Erro ao atualizar máquina', detalhes: error.message },
