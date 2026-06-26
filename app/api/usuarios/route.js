@@ -47,7 +47,7 @@ export async function POST(request) {
       return NextResponse.json({ erro: 'Este e-mail já está cadastrado.' }, { status: 409 });
     }
     return NextResponse.json(
-      { erro: 'Erro ao criar usuário', detalhes: error.message, stack: error.stack, tipo: error.constructor?.name },
+      { erro: 'Erro ao criar usuário', detalhes: error.message },
       { status: 500 }
     );
   }

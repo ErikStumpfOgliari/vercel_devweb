@@ -13,6 +13,7 @@
     "seed": "node backend/src/seed.js"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "date-fns": "^2.30.0",
